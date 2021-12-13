@@ -20,6 +20,8 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
+		
+		Bukkit.broadcastMessage("\"" + e.getMessage() + "\"");
 	}
 
 }

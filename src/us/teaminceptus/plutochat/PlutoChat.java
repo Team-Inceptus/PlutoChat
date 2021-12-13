@@ -16,12 +16,12 @@ import us.teaminceptus.plutochat.listeners.PlayerListener;
 
 public class PlutoChat extends JavaPlugin {
 	
-	private static File playersFile = new File(JavaPlugin.getPlugin(PlutoChat.class).getDataFolder(), "players.yml");
-	private static FileConfiguration playersConfig = YamlConfiguration.loadConfiguration(playersFile);
+	private static File playersFile;
+	private static FileConfiguration playersConfig;
 	
 	public void onEnable() {
-		saveDefaultConfig();
-		saveConfig();
+		playersFile = new File(JavaPlugin.getPlugin(PlutoChat.class).getDataFolder(), "players.yml");
+		playersConfig = YamlConfiguration.loadConfiguration(playersFile);
 		// Commands & Listeners
 		new Help(this);
 		new Mute(this);
@@ -32,6 +32,7 @@ public class PlutoChat extends JavaPlugin {
 	
 	public static void checkConfigs() {
 		PlutoChat plugin = JavaPlugin.getPlugin(PlutoChat.class);
+
 		// Config
 		FileConfiguration config = plugin.getConfig();
 		
@@ -41,6 +42,10 @@ public class PlutoChat extends JavaPlugin {
 		
 		if (!(config.isString("BottomList"))) {
 			config.set("BottomTab", "");
+		}
+		
+		if (!(config.isBoolean("ColorChat"))) {
+			config.set("ColorChat", true);
 		}
 		
 		plugin.saveConfig();

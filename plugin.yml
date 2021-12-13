@@ -1,0 +1,5 @@
+name: PlutoChat
+main: us.teaminceptus.plutochat.PlutoChat
+version: 1.0.0
+author: Team Inceptus
+api-version: 1.18
