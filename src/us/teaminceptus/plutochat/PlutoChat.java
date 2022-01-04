@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import us.teaminceptus.plutochat.commands.Help;
@@ -20,7 +21,7 @@ public class PlutoChat extends JavaPlugin {
 	private static FileConfiguration playersConfig;
 	
 	public void onEnable() {
-		playersFile = new File(JavaPlugin.getPlugin(PlutoChat.class).getDataFolder(), "players.yml");
+		playersFile = new File(this.getDataFolder(), "players.yml");
 		playersConfig = YamlConfiguration.loadConfiguration(playersFile);
 		// Commands & Listeners
 		new Help(this);
@@ -78,6 +79,10 @@ public class PlutoChat extends JavaPlugin {
 			if (!(status.isString("tabname"))) {
 				status.set("tabname", p.getName());
 			}
+			
+			if (!(status.isBoolean("muted"))) {
+				status.set("muted", false);
+			}
 		}
 		
 		try {
@@ -94,6 +99,10 @@ public class PlutoChat extends JavaPlugin {
 	
 	public static FileConfiguration getPlayersConfig() {
 		return playersConfig;
+	}
+	
+	public static ConfigurationSection getInfo(Player p) {
+		return getPlayersConfig().getConfigurationSection(p.getUniqueId().toString());
 	}
 	
 	

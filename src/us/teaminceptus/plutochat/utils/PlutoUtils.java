@@ -2,9 +2,11 @@ package us.teaminceptus.plutochat.utils;
 
 import org.bukkit.entity.Player;
 
-public class PlutoUtils {
+import us.teaminceptus.plutochat.PlutoChat;
 
+public class PlutoUtils {
+	
 	public static boolean isMuted(Player p) {
-		return false;
+		return PlutoChat.getInfo(p).getBoolean("muted");
 	}
 }
