@@ -20,17 +20,45 @@ public class ChatColor implements TabExecutor {
 			PlutoChat.sendError(p, "Please provide a valid color code.");
 			return false;
 		}
+		
+		try {
+			org.bukkit.ChatColor c = org.bukkit.ChatColor.valueOf(args[0].toUpperCase());
 
-		if (args.length < 2) {
-			try {
-				org.bukkit.ChatColor c = org.bukkit.ChatColor.valueOf(args[0].toUpperCase());
-			} catch (IllegalArgumentException e) {
+			if (!(c.isColor())) {
 				PlutoChat.sendError(p, "Please provide a valid color code.");
 				return false;
 			}
-		} else {
 			
+			PlutoChat.getInfo(p).set("chatcolor", c.name());
+			p.sendMessage(ChatColor.GREEN + "Successfully set ChatColor to " + c + c.name().toLowerCase() + ChatColor.GREEN + ".");
+		} catch (IllegalArgumentException e) {
+			PlutoChat.sendError(p, "Please provide a valid color code.");
+			return false;
 		}
+
+		if (!(args.length < 2)) {
+			try {
+				if (args[0].equalsIgnoreCase("regular")) {
+					PlutoChat.getInfo(p).set("chatformat", null);
+					p.sendMessage(ChatColor.GREEN + "Successfully reset ChatFormat.");
+					return true;
+				}
+				org.bukkit.ChatColor c = org.bukkit.ChatColor.valueOf(args[0].toUpperCase());
+
+				if (!(c.isFormat())) {
+					PlutoChat.sendError(p, "Please provide a valid format code.");
+					return false;
+				}
+				
+				PlutoChat.getInfo(p).set("chatformat", c.name());
+				p.sendMessage(ChatColor.GREEN + "Successfully set ChatFormat to " + c + c.name().toLowerCase() + ChatColor.GREEN + ".");
+			} catch (IllegalArgumentException e) {
+				PlutoChat.sendError(p, "Please provide a valid format code.");
+				return false;
+			}
+		}
+		PlutoChat.checkConfigs();
+		return true;
 	}
 	
 	@Override
