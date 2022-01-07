@@ -3,3 +3,22 @@ main: us.teaminceptus.plutochat.PlutoChat
 version: 1.0.0
 author: Team Inceptus
 api-version: 1.18
+commands:
+  # User
+  chatcolor:
+    description: Set ChatColor and ChatFormat for speaking in chat.
+    permission: plutochat.chat.color
+    aliases: [chatc, chatformat, chatf, cf, cc]
+  plutohelp:
+    description: Default Help Command
+    permission: plutochat.help
+    aliases: [phelp, ph, p?]
+  # Admin
+  config:
+    description: Edit configuration values
+    permission: plutochat.admin.config
+    aliases: [pconfig, plutoconfig, pc]
+  mute:
+    description: Ability to mute players
+    permission: plutochat.admin.mute
+    aliases: [shut, silence]
