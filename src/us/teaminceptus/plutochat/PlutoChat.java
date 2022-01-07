@@ -19,6 +19,38 @@ public class PlutoChat extends JavaPlugin {
 	
 	private static File playersFile;
 	private static FileConfiguration playersConfig;
+
+	public static void sendPluginMessage(CommandSender sender, String msg) {
+		sender.sendMessage(ChatColor.BLUE + "[" + ChatColor.DARK_AQUA + "PlutoChat" + ChatColor.BLUE + "] " + ChatColor.YELLOW + msg);
+	}
+
+	public static void sendError(CommandSender sender, String msg) {
+		sendPluginMessage(sender, ChatColor.RED + msg);
+	}
+
+	public static enum Erorr {
+		ARGS("Please provide valid arguments."),
+		NO_PERMS("You do not have permission to use this command."),
+		ARGS_BOOLEAN("Please provide true or false."),
+		ARGS_INT("Please provide a valid integer."),
+		ARGS_INVALID("This value does not exist."),
+		ARGS_VALUE("Please provide a valid value."),
+		ARGS_PLAYER("Please provide a valid player."),
+		;
+		private final String message;
+		
+		private Error(String message) {
+			this.message = message;
+		}
+
+		public final String getMessage() {
+			return this.message;
+		}
+	}
+	
+	public static void sendError(CommandSender sender, Error err) {
+		sendError(sender, err.getMessage());
+	}
 	
 	public void onEnable() {
 		playersFile = new File(this.getDataFolder(), "players.yml");
@@ -47,6 +79,14 @@ public class PlutoChat extends JavaPlugin {
 		
 		if (!(config.isBoolean("ColorChat"))) {
 			config.set("ColorChat", true);
+		}
+
+		if (!(config.isString("ChatPrefix"))) {
+			config.set("ChatPrefix", "<");
+		}
+
+		if (!(config.isString("ChatSuffix"))) {
+			config.set("ChatSuffix", ">");
 		}
 		
 		plugin.saveConfig();
@@ -83,6 +123,14 @@ public class PlutoChat extends JavaPlugin {
 			if (!(status.isBoolean("muted"))) {
 				status.set("muted", false);
 			}
+
+			if (!(status.isString("chatcolor"))) {
+				status.set("chatcolor", "WHITE");
+			}
+
+			if (!(status.isString("chatformat"))) {
+				status.set("chatformat", "REGULAR");
+			}
 		}
 		
 		try {
@@ -101,7 +149,7 @@ public class PlutoChat extends JavaPlugin {
 		return playersConfig;
 	}
 	
-	public static ConfigurationSection getInfo(Player p) {
+	public static ConfigurationSection getInfo(OfflinePlayer p) {
 		return getPlayersConfig().getConfigurationSection(p.getUniqueId().toString());
 	}
 	
