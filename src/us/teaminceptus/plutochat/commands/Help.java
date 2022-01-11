@@ -1,5 +1,9 @@
 package us.teaminceptus.plutochat.commands;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+
 import us.teaminceptus.plutochat.PlutoChat;
 
 public class Help implements CommandExecutor {
