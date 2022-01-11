@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import us.teaminceptus.plutochat.commands.Help;
+import us.teaminceptus.plutochat.commands.admin.Config;
 import us.teaminceptus.plutochat.commands.admin.Mute;
 import us.teaminceptus.plutochat.listeners.PlayerListener;
 
@@ -28,7 +31,7 @@ public class PlutoChat extends JavaPlugin {
 		sendPluginMessage(sender, ChatColor.RED + msg);
 	}
 
-	public static enum Erorr {
+	public static enum PlutoError {
 		ARGS("Please provide valid arguments."),
 		NO_PERMS("You do not have permission to use this command."),
 		ARGS_BOOLEAN("Please provide true or false."),
@@ -39,7 +42,7 @@ public class PlutoChat extends JavaPlugin {
 		;
 		private final String message;
 		
-		private Error(String message) {
+		private PlutoError(String message) {
 			this.message = message;
 		}
 
@@ -48,7 +51,7 @@ public class PlutoChat extends JavaPlugin {
 		}
 	}
 	
-	public static void sendError(CommandSender sender, Error err) {
+	public static void sendError(CommandSender sender, PlutoError err) {
 		sendError(sender, err.getMessage());
 	}
 	
@@ -57,7 +60,11 @@ public class PlutoChat extends JavaPlugin {
 		playersConfig = YamlConfiguration.loadConfiguration(playersFile);
 		// Commands & Listeners
 		new Help(this);
+		new us.teaminceptus.plutochat.commands.ChatColor(this);
+		
 		new Mute(this);
+		new Config(this);
+		
 		new PlayerListener(this);
 		checkConfigs();
 		saveConfig();
@@ -69,12 +76,20 @@ public class PlutoChat extends JavaPlugin {
 		// Config
 		FileConfiguration config = plugin.getConfig();
 		
-		if (!(config.isString("TopList"))) {
-			config.set("TopTab", "Welcome to my server!");
+		if (!(config.isBoolean("TopTabEnabled"))) {
+			config.set("TopTabEnabled", true);
 		}
 		
-		if (!(config.isString("BottomList"))) {
-			config.set("BottomTab", "");
+		if (!(config.isBoolean("BottomTabEnabled"))) {
+			config.set("BottomTabEnabled", true);
+		}
+		
+		if (!(config.isString("TopTab"))) {
+			config.set("TopTab", "  Welcome to my server!  ");
+		}
+		
+		if (!(config.isString("BottomTab"))) {
+			config.set("BottomTab", "Tab by PlutoChat");
 		}
 		
 		if (!(config.isBoolean("ColorChat"))) {
@@ -131,6 +146,22 @@ public class PlutoChat extends JavaPlugin {
 			if (!(status.isString("chatformat"))) {
 				status.set("chatformat", "REGULAR");
 			}
+			
+			// Setting
+			if (p.isOnline()) {
+				Player op = p.getPlayer();
+				
+				if (config.getBoolean("TopTabEnabled")) {
+					op.setPlayerListHeader("\n" + config.getString("TopTab") + "\n");
+				}
+				
+				if (config.getBoolean("BottomTabEnabled")) {
+					op.setPlayerListFooter("\n" + config.getString("BottomTab") + "\n");
+				}
+				
+				op.setDisplayName(ChatColor.translateAlternateColorCodes('&', status.getString("displayname")));
+				op.setPlayerListName(ChatColor.translateAlternateColorCodes('&', status.getString("tabname")));
+			}
 		}
 		
 		try {
@@ -150,7 +181,7 @@ public class PlutoChat extends JavaPlugin {
 	}
 	
 	public static ConfigurationSection getInfo(OfflinePlayer p) {
-		return getPlayersConfig().getConfigurationSection(p.getUniqueId().toString());
+		return getPlayersConfig().getConfigurationSection(p.getUniqueId().toString()).getConfigurationSection("information");
 	}
 	
 	
