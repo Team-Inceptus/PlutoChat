@@ -12,13 +12,54 @@ commands:
   plutohelp:
     description: Default Help Command
     permission: plutochat.help
-    aliases: [phelp, ph, p?]
+    aliases: [phelp, ph, plutochat, plc]
   # Admin
-  config:
+  plutoconfiguration:
     description: Edit configuration values
     permission: plutochat.admin.config
-    aliases: [pconfig, plutoconfig, pc]
+    aliases: [pconfiguration, pconfig, plutoconfig, pc]
   mute:
     description: Ability to mute players
     permission: plutochat.admin.mute
     aliases: [shut, silence]
+  setname:
+    description: Set the player's display or tab list name.
+    permission: plutochat.admin.setname
+    aliases: [setn, name]
+permissions:
+  plutochat.*:
+    description: All PlutoChat permissions
+    default: op
+    children:
+      plutochat.chat: true
+      plutochat.admin: true
+      plutochat.help: true
+  plutochat.help:
+    description: Access to Help Command
+    default: true
+  # Chat
+  plutochat.chat:
+    description: All PlutoChat chat permissions
+    default: true
+    children:
+      plutochat.chat.color: true
+  plutochat.chat.color:
+    description: Access to change color and format chat
+    default: true
+  # Admin
+  plutochat.admin:
+    description: All PlutoChat admin permissions
+    default: op
+    children:
+      plutochat.admin.mute: true
+      plutochat.admin.config: true
+      plutochat.admin.setname: true
+  plutochat.admin.mute:
+    description: Access to Mute Command
+    default: op
+  plutochat.admin.config:
+    description: Access to Config Command
+    default: op
+  plutochat.admin.setname:
+    description: Access to SetName Command
+    default: op
