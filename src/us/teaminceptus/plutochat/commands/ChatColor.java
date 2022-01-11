@@ -1,5 +1,13 @@
 package us.teaminceptus.plutochat.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
+
 import us.teaminceptus.plutochat.PlutoChat;
 
 public class ChatColor implements TabExecutor {
@@ -30,7 +38,7 @@ public class ChatColor implements TabExecutor {
 			}
 			
 			PlutoChat.getInfo(p).set("chatcolor", c.name());
-			p.sendMessage(ChatColor.GREEN + "Successfully set ChatColor to " + c + c.name().toLowerCase() + ChatColor.GREEN + ".");
+			p.sendMessage(org.bukkit.ChatColor.GREEN + "Successfully set ChatColor to " + c + c.name().toLowerCase() + org.bukkit.ChatColor.GREEN + ".");
 		} catch (IllegalArgumentException e) {
 			PlutoChat.sendError(p, "Please provide a valid color code.");
 			return false;
@@ -38,12 +46,12 @@ public class ChatColor implements TabExecutor {
 
 		if (!(args.length < 2)) {
 			try {
-				if (args[0].equalsIgnoreCase("regular")) {
+				if (args[1].equalsIgnoreCase("regular")) {
 					PlutoChat.getInfo(p).set("chatformat", null);
-					p.sendMessage(ChatColor.GREEN + "Successfully reset ChatFormat.");
+					p.sendMessage(org.bukkit.ChatColor.GREEN + "Successfully reset ChatFormat.");
 					return true;
 				}
-				org.bukkit.ChatColor c = org.bukkit.ChatColor.valueOf(args[0].toUpperCase());
+				org.bukkit.ChatColor c = org.bukkit.ChatColor.valueOf(args[1].toUpperCase());
 
 				if (!(c.isFormat())) {
 					PlutoChat.sendError(p, "Please provide a valid format code.");
@@ -51,7 +59,7 @@ public class ChatColor implements TabExecutor {
 				}
 				
 				PlutoChat.getInfo(p).set("chatformat", c.name());
-				p.sendMessage(ChatColor.GREEN + "Successfully set ChatFormat to " + c + c.name().toLowerCase() + ChatColor.GREEN + ".");
+				p.sendMessage(org.bukkit.ChatColor.GREEN + "Successfully set ChatFormat to " + c + c.name().toLowerCase() + org.bukkit.ChatColor.GREEN + ".");
 			} catch (IllegalArgumentException e) {
 				PlutoChat.sendError(p, "Please provide a valid format code.");
 				return false;
