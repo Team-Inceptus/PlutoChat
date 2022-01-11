@@ -1,14 +1,17 @@
 package us.teaminceptus.plutochat.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import us.teaminceptus.plutochat.PlutoChat;
+import us.teaminceptus.plutochat.utils.PlutoUtils;
 
 public class PlayerListener implements Listener {
 	
@@ -25,8 +28,13 @@ public class PlayerListener implements Listener {
 		
 		FileConfiguration config = plugin.getConfig();
 		
-		p.setPlayerListHeader(config.getString("TopList"));
-		p.setPlayerListFooter(config.getString("BottomList"));
+		if (config.getBoolean("TopTabEnabled")) {
+			p.setPlayerListHeader("\n" + config.getString("TopTab") + "\n");
+		}
+		
+		if (config.getBoolean("BottomTabEnabled")) {
+			p.setPlayerListFooter("\n" + config.getString("BottomTab") + "\n");
+		}
 		
 		ConfigurationSection info = PlutoChat.getInfo(p).getConfigurationSection("information");
 		
@@ -48,7 +56,7 @@ public class PlayerListener implements Listener {
 		String prefix = config.getString("ChatPrefix");
 		String suffix = config.getString("ChatSuffix");
 
-		e.setFormat(prefix + "%s" + suffix + ": " + (config.getBoolean("ColorChat") ? PlutoUtils.getChatColor(p) + (PlutoChat.getChatFormat(p) == null ? "" : PlutoChat.getChatFormat(p)) + "%s" : "%s"));
+		e.setFormat(prefix + "%s" + suffix + " " + (config.getBoolean("ColorChat") ? PlutoUtils.getChatColor(p) + (PlutoUtils.getChatFormat(p) == null ? "" : PlutoUtils.getChatFormat(p) + "") + "%s" : "%s"));
 	}
 
 }
