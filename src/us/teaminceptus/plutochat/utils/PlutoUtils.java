@@ -1,7 +1,17 @@
 package us.teaminceptus.plutochat.utils;
 
-import org.bukkit.entity.Player;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+
+import com.google.gson.Gson;
 
 import us.teaminceptus.plutochat.PlutoChat;
 
@@ -39,10 +49,10 @@ public class PlutoUtils {
 			try {
 				HttpRequest request = HttpRequest.newBuilder()
 						.GET()
-						.uri(URI.create(url))
+						.uri(URI.create("\"https://api.mojang.com/users/profiles/minecraft/\" + name"))
 						.setHeader("User-Agent", "Java 11 HttpClient Bot")
 						.build();
-				HttpResponse<String> response = httpClient.send("https://api.mojang.com/users/profiles/minecraft/" + name, HttpResponse.BodyHandlers.ofString());
+				HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 				
 					if (response.statusCode() == 200) {
 						Gson g = new Gson();
