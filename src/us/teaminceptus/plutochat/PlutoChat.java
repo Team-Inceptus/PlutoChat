@@ -2,6 +2,7 @@ package us.teaminceptus.plutochat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.teaminceptus.plutochat.commands.Help;
 import us.teaminceptus.plutochat.commands.admin.Config;
 import us.teaminceptus.plutochat.commands.admin.Mute;
+import us.teaminceptus.plutochat.commands.admin.SetName;
 import us.teaminceptus.plutochat.listeners.PlayerListener;
 
 public class PlutoChat extends JavaPlugin {
@@ -64,10 +66,18 @@ public class PlutoChat extends JavaPlugin {
 		
 		new Mute(this);
 		new Config(this);
+		new SetName(this);
 		
 		new PlayerListener(this);
 		checkConfigs();
 		saveConfig();
+		
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			ConfigurationSection info = getInfo(p);
+			
+			p.setDisplayName(ChatColor.translateAlternateColorCodes('&', info.getString("displayname")) + ChatColor.RESET);
+			p.setPlayerListName(ChatColor.translateAlternateColorCodes('&', info.getString("tabname")) + ChatColor.RESET);
+		}
 	}
 	
 	public static void checkConfigs() {
@@ -102,6 +112,14 @@ public class PlutoChat extends JavaPlugin {
 
 		if (!(config.isString("ChatSuffix"))) {
 			config.set("ChatSuffix", ">");
+		}
+		
+		if (!(config.isString("JoinMessage"))) {
+			config.set("JoinMessage", "&e%player% has joined the game.");
+		}
+		
+		if (!(config.isString("LeaveMessage"))) {
+			config.set("LeaveMessage", "&e%player% has left the game.");
 		}
 		
 		plugin.saveConfig();
@@ -152,11 +170,11 @@ public class PlutoChat extends JavaPlugin {
 				Player op = p.getPlayer();
 				
 				if (config.getBoolean("TopTabEnabled")) {
-					op.setPlayerListHeader("\n" + config.getString("TopTab") + "\n");
+					op.setPlayerListHeader("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("TopTab")) + "\n");
 				}
 				
 				if (config.getBoolean("BottomTabEnabled")) {
-					op.setPlayerListFooter("\n" + config.getString("BottomTab") + "\n");
+					op.setPlayerListFooter("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("BottomTab")) + "\n");
 				}
 				
 				op.setDisplayName(ChatColor.translateAlternateColorCodes('&', status.getString("displayname")));
@@ -181,7 +199,9 @@ public class PlutoChat extends JavaPlugin {
 	}
 	
 	public static ConfigurationSection getInfo(OfflinePlayer p) {
-		return getPlayersConfig().getConfigurationSection(p.getUniqueId().toString()).getConfigurationSection("information");
+		UUID uuid = (Bukkit.getOnlineMode() ? p.getUniqueId() : UUID.nameUUIDFromBytes(("OfflinePlayer:" + p.getName()).getBytes()));
+		
+		return getPlayersConfig().getConfigurationSection(uuid.toString()).getConfigurationSection("information");
 	}
 	
 	
