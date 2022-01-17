@@ -31,7 +31,7 @@ public class PlutoUtils {
 	public static ChatColor getChatColor(OfflinePlayer p) {
 		try {
 			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("chatcolor").toUpperCase()); 
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			return ChatColor.WHITE;
 		}	
 	}
@@ -39,7 +39,7 @@ public class PlutoUtils {
 	public static ChatColor getChatFormat(OfflinePlayer p) {
 		try {
 			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("chatformat").toUpperCase()); 
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -49,7 +49,7 @@ public class PlutoUtils {
 			try {
 				HttpRequest request = HttpRequest.newBuilder()
 						.GET()
-						.uri(URI.create("\"https://api.mojang.com/users/profiles/minecraft/\" + name"))
+						.uri(URI.create("https://api.mojang.com/users/profiles/minecraft/" + name))
 						.setHeader("User-Agent", "Java 11 HttpClient Bot")
 						.build();
 				HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
