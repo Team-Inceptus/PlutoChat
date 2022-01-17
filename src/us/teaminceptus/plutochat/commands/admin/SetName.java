@@ -1,5 +1,6 @@
 package us.teaminceptus.plutochat.commands.admin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ public class SetName implements TabExecutor {
 	public SetName(PlutoChat plugin) {
 		this.plugin = plugin;
 		plugin.getCommand("setname").setExecutor(this);
+		plugin.getCommand("setname").setTabCompleter(this);
 	}
 	
 	@Override
@@ -40,13 +42,13 @@ public class SetName implements TabExecutor {
 		OfflinePlayer target = Bukkit.getOfflinePlayer(PlutoUtils.nameToUUID(args[0]));
 		
 		if (args.length < 2) {
-			PlutoChat.sendError(sender, "Please provide tab or display.");
+			PlutoChat.sendError(sender, "Please provide tab, display, both, or reset.");
 			return false;
 		}
 		
 		
-		if (!(args[1].equalsIgnoreCase("tab")) && !(args[1].equalsIgnoreCase("display"))) {
-			PlutoChat.sendError(sender, "Please provide tab or display.");
+		if (!(args[1].equalsIgnoreCase("tab")) && !(args[1].equalsIgnoreCase("display")) && !(args[1].equalsIgnoreCase("both")) && !(args[1].equalsIgnoreCase("reset"))) {
+			PlutoChat.sendError(sender, "Please provide tab, display, both, or reset.");
 			return false;
 		}
 		
@@ -62,15 +64,38 @@ public class SetName implements TabExecutor {
 		}
 		String name = String.join(" ", nameArgs);
 		
-		PlutoChat.getInfo(target).set(args[1].toLowerCase() + "name", name);
+		
 		if (target.isOnline()) {
 			Player ot = target.getPlayer();
-			if (args[1].equalsIgnoreCase("tab")) ot.setPlayerListName(ChatColor.translateAlternateColorCodes('&', name));
-			else if (args[1].equalsIgnoreCase("display")) ot.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+			if (args[1].equalsIgnoreCase("tab")) {
+				ot.setPlayerListName(ChatColor.translateAlternateColorCodes('&', name) + ChatColor.RESET);
+				PlutoChat.getInfo(ot).set("tabname", name);
+			} else if (args[1].equalsIgnoreCase("display")) {
+				ot.setDisplayName(ChatColor.translateAlternateColorCodes('&', name) + ChatColor.RESET);
+				PlutoChat.getInfo(ot).set("tabname", name);
+				PlutoChat.getInfo(ot).set("displayname", name);
+			} else if (args[1].equalsIgnoreCase("both")) {
+				ot.setPlayerListName(ChatColor.translateAlternateColorCodes('&', name) + ChatColor.RESET);
+				ot.setDisplayName(ChatColor.translateAlternateColorCodes('&', name) + ChatColor.RESET);
+				PlutoChat.getInfo(ot).set("tabname", name);
+				PlutoChat.getInfo(ot).set("displayname", name);
+			} else if (args[1].equalsIgnoreCase("reset")) {
+				ot.setPlayerListName(ot.getName());
+				ot.setDisplayName(ot.getName());
+				PlutoChat.getInfo(ot).set("tabname", ot.getName());
+				PlutoChat.getInfo(ot).set("displayname", ot.getName());
+			}
+		} else {
+			PlutoChat.sendError(sender, ChatColor.RED + "This player is not online.");
+			return false;
 		}
 		
-		sender.sendMessage(ChatColor.GREEN + "Succesfully set " + ChatColor.GOLD + args[1].toLowerCase() + "name" + ChatColor.GREEN + " to: \"" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', name) + ChatColor.GREEN +  "\"");
-		
+		sender.sendMessage(ChatColor.GREEN + "Succesfully set " + ChatColor.GOLD + args[1].toLowerCase() + ChatColor.GREEN + " to: \"" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', name) + ChatColor.GREEN +  "\"");
+		try {
+			PlutoChat.getPlayersConfig().save(PlutoChat.getPlayersFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	
@@ -84,7 +109,7 @@ public class SetName implements TabExecutor {
 				return suggestions;
 			}
 			case 2: {
-				suggestions.addAll(Arrays.asList("tab", "display"));
+				suggestions.addAll(Arrays.asList("tab", "display", "both", "reset"));
 				return suggestions;
 			}
 		}
