@@ -18,8 +18,8 @@ commands:
     description: Edit configuration values
     permission: plutochat.admin.config
     aliases: [pconfiguration, pconfig, plutoconfig, pc]
-  mute:
-    description: Ability to mute players
+  setmute:
+    description: Ability to mute and unmute players
     permission: plutochat.admin.mute
     aliases: [shut, silence]
   setname:
