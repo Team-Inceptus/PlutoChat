@@ -1,5 +1,6 @@
 package us.teaminceptus.plutochat.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +66,11 @@ public class ChatColor implements TabExecutor {
 				return false;
 			}
 		}
-		PlutoChat.checkConfigs();
+		try {
+			PlutoChat.getPlayersConfig().save(PlutoChat.getPlayersFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	
