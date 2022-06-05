@@ -1,6 +1,3 @@
-.classpath
-.project
-.settings/
-.gitattributes
 *.jar
-/target/
+target
+.idea
