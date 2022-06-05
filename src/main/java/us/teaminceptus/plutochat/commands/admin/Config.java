@@ -1,13 +1,12 @@
 package us.teaminceptus.plutochat.commands.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,7 +15,9 @@ import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.*;
 import revxrsal.commands.autocomplete.SuggestionProvider;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+import revxrsal.commands.command.ArgumentStack;
 import us.teaminceptus.plutochat.PlutoChat;
+import us.teaminceptus.plutochat.language.Language;
 
 @Command({"pconfig", "pconfiguration", "plutoconfig", "plutoconfiguration", "plutoc"})
 @Description("Get, Set, and Reload PlutoChat Configuration values")
@@ -28,19 +29,21 @@ public final class Config {
 	
 	public Config(PlutoChat plugin){
 		this.plugin = plugin;
-		plugin.getHandler().register(this);
-
-		plugin.getHandler().registerValueResolver(SetType.class, ctx -> SetType.valueOf(ctx.popForParameter().toUpperCase()));
-		plugin.getHandler().getAutoCompleter().registerParameterSuggestions(SetType.class, SuggestionProvider.of(SetType.ARGS));
-		
 		plugin.getHandler().getAutoCompleter().registerSuggestion("config", plugin.getConfig().getKeys(false));
-	}
+		plugin.getHandler().getAutoCompleter().registerSuggestion("configvalue", (args, sender, cmd) -> {
+			String key = args.get(0);
+			FileConfiguration config = plugin.getConfig();
+			Set<String> suggestions = new HashSet<>();
 
-	public enum SetType {
-		GET,
-		SET;
+			if (config.isBoolean(key)) suggestions.addAll(Arrays.asList("true", "false"));
+			if (key.equals("Language")) {
+				for (Language l : Language.values()) suggestions.add(l.getIdentifier());
+				suggestions.add("en");
+			}
 
-		public static final String[] ARGS = new String[] { "get", "set" };
+			return suggestions;
+		});
+		plugin.getHandler().register(this);
 	}
 
 	@Subcommand("get")
@@ -55,12 +58,12 @@ public final class Config {
 		}
 
 		String chosen = config.get(key).toString();
-		sender.sendMessage(String.format(PlutoChat.getMessage("response.config_value"), chosen));
+		sender.sendMessage(String.format(PlutoChat.getMessage("response.config_value"), key, chosen));
 	}
 
 	@Subcommand("set")
-	@AutoComplete("@config *")
-	public void setConfig(CommandSender sender, String key, String... valueArr) {
+	@AutoComplete("@config @configvalue")
+	public void setConfig(CommandSender sender, String key, String value) {
 		FileConfiguration config = plugin.getConfig();
 		Set<String> keys = config.getKeys(false).stream().filter(k -> !config.isConfigurationSection(k)).collect(Collectors.toSet());
 
@@ -68,8 +71,6 @@ public final class Config {
 			sender.sendMessage(PlutoChat.getMessage("arguments.inexistent"));
 			return;
 		}
-
-		String value = String.join(" ", valueArr);
 
 		if (config.isBoolean(key) && !value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) {
 			sender.sendMessage(PlutoChat.getMessage("arguments.bool"));
@@ -84,6 +85,7 @@ public final class Config {
 
 			sender.sendMessage(String.format(PlutoChat.getMessage("response.success.set"), key, ChatColor.translateAlternateColorCodes('&', value)));
 			plugin.saveConfig();
+			plugin.reloadConfig();
 		} catch (NumberFormatException e) {
 			if (config.isInt(key)) sender.sendMessage(PlutoChat.getMessage("arguments.integer"));
 			else sender.sendMessage(PlutoChat.getMessage("arguments"));
@@ -105,6 +107,13 @@ public final class Config {
 	public void reloadConfig(CommandSender sender) {
 		plugin.reloadConfig();
 		PlutoChat.checkConfigs();
+
+		for (Language l : Language.values()) {
+			String name =  "plutochat" + (l.getIdentifier().length() > 0 ? "_" + l.getIdentifier() : "") + ".properties";
+			File f = new File(plugin.getDataFolder(), name);
+			if (!f.exists()) plugin.saveResource(name, false);
+		}
+
 		sender.sendMessage(PlutoChat.getMessage("response.success.reload"));
 	}
 
