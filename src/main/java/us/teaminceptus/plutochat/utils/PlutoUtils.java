@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
 import us.teaminceptus.plutochat.PlutoChat;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -16,17 +18,25 @@ import java.util.UUID;
 public class PlutoUtils {
 
 	public static boolean isMuted(OfflinePlayer p) {
-		return PlutoChat.getInfo(p).getBoolean("muted");
+		return PlutoChat.getInfo(p).getBoolean("information.muted");
 	}
 
 	public static void setMuted(OfflinePlayer p, boolean muted) {
-		PlutoChat.getInfo(p).set("muted", muted);
+		FileConfiguration config = PlutoChat.getInfo(p);
+		config.set("information.muted", muted);
+
+		try {
+			config.save(PlutoChat.getFile(p));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		PlutoChat.checkConfigs();
 	}
 
 	public static ChatColor getChatColor(OfflinePlayer p) {
 		try {
-			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("chatcolor").toUpperCase()); 
+			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("information.chatcolor").toUpperCase());
 		} catch (Exception e) {
 			return ChatColor.WHITE;
 		}	
@@ -34,7 +44,7 @@ public class PlutoUtils {
 
 	public static ChatColor getChatFormat(OfflinePlayer p) {
 		try {
-			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("chatformat").toUpperCase()); 
+			return ChatColor.valueOf(PlutoChat.getInfo(p).getString("information.chatformat").toUpperCase());
 		} catch (Exception e) {
 			return null;
 		}
