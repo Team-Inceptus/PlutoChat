@@ -26,14 +26,15 @@ BottomTab: Tab by PlutoChat
 ColorChat: true
 
 # The Prefix that comes before a Player's Name in Chat
-ChatPrefix: <
+ChatPrefix: "<"
 # The Suffix that comes after a Player's Name in Chat
-ChatSuffix: >
+# If you want to use the greater than (>), remember to put it in quotes ('>' or ">")
+ChatSuffix: ">"
 
 # The Join Message; Supports & Codes.
-# %player% = Player's Name
-JoinMessage: &e%player% has joined the game.
+# %s - Player's Name
+JoinMessage: "&e%s &ehas joined the game"
 
 # The Leave Message; Supports & Codes.
-# %player% = Player's Name
-LeaveMessage: &e%player% has left the game.
+# %s - Player's Name
+LeaveMessage: "&e%s &ehas left the game"
