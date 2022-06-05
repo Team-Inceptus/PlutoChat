@@ -42,6 +42,7 @@ public enum Language {
     }
 
     public static Language getById(String id) {
+        if (id.equalsIgnoreCase("en")) return ENGLISH;
         for (Language l : values()) {
             if (l.getIdentifier().equalsIgnoreCase(id)) return l;
         }
