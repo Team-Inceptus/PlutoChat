@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,9 +28,9 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("JoinMessage").replaceAll("%player%", p.getDisplayName()).replaceAll("%name%", p.getName())));
 		FileConfiguration config = plugin.getConfig();
-		FileConfiguration info = PlutoChat.getInfo(p);
+		FileConfiguration pConfig = PlutoChat.getInfo(p);
+		ConfigurationSection info = pConfig.getConfigurationSection("information");
 		
 		if (config.getBoolean("TopTabEnabled")) p.setPlayerListHeader("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("TopTab")) + "\n");
 		else p.setPlayerListHeader("");
@@ -39,9 +40,10 @@ public class PlayerListener implements Listener {
 		
 		p.setDisplayName(ChatColor.translateAlternateColorCodes('&', info.getString("displayname")) + ChatColor.RESET);
 		p.setPlayerListName(ChatColor.translateAlternateColorCodes('&', info.getString("tabname")) + ChatColor.RESET);
-		
+
+		e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format(config.getString("JoinMessage"), p.getDisplayName() == null || p.getDisplayName().length() == 0 ? p.getName() : p.getDisplayName() )));
 		try {
-			info.save(PlutoChat.getFile(p));
+			pConfig.save(PlutoChat.getFile(p));
 		} catch (IOException err) {
 			plugin.getLogger().info("Error Saving Configuration");
 			err.printStackTrace();
@@ -56,20 +58,24 @@ public class PlayerListener implements Listener {
 
 		if (PlutoUtils.isMuted(p)) {
 			e.setCancelled(true);
-			p.sendMessage(ChatColor.RED + "You are currently muted.");
+			p.sendMessage(PlutoChat.getConstant("response.muted"));
 		}
 
-		String prefix = config.getString("ChatPrefix");
-		String suffix = config.getString("ChatSuffix");
+		String prefix = config.getString("ChatPrefix", "<");
+		String suffix = config.getString("ChatSuffix", ">");
 
-		e.setFormat(prefix + "%s" + suffix + " " + (config.getBoolean("ColorChat") ? PlutoUtils.getChatColor(p) + (PlutoUtils.getChatFormat(p) == null ? "" : PlutoUtils.getChatFormat(p) + "") + "%s" : "%s"));
+		String format = PlutoUtils.getChatFormat(p) == null ? "" : PlutoUtils.getChatFormat(p) + "";
+		String color = PlutoUtils.getChatColor(p) == null ? "" : PlutoUtils.getChatColor(p) + "";
+
+		e.setFormat(prefix + "%s" + suffix + " " + (config.getBoolean("ColorChat") ? color + format + "%s" : "%s"));
 	}
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-		
-		e.setQuitMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("LeaveMessage").replaceAll("%player%", p.getDisplayName()).replaceAll("%name%", p.getName())));
+		FileConfiguration config = plugin.getConfig();
+
+		e.setQuitMessage(ChatColor.translateAlternateColorCodes('&', String.format(config.getString("JoinMessage"), p.getDisplayName() == null || p.getDisplayName().length() == 0 ? p.getName() : p.getDisplayName() )));
 	}
 
 }
