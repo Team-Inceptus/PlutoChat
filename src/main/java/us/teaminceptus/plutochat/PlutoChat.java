@@ -80,6 +80,13 @@ public class PlutoChat extends JavaPlugin {
 		saveDefaultConfig();
 		saveConfig();
 		playerDir = new File(this.getDataFolder(), "players");
+		if (!playerDir.exists()) playerDir.mkdir();
+
+		for (Language l : Language.values()) {
+			String name =  "plutochat" + (l.getIdentifier().length() > 0 ? "_" + l.getIdentifier() : "") + ".properties";
+			File f = new File(getDataFolder(), name);
+			if (!f.exists()) saveResource(name, false);
+		}
 
 		getLogger().info("Loading Classes...");
 
@@ -87,7 +94,7 @@ public class PlutoChat extends JavaPlugin {
 		setupLamp();
 		new PlayerListener(this);
 
-		new UpdateChecker(this, UpdateCheckSource.SPIGOT, "https://www.spigotmc.org/resources/plutochat.99282/")
+		new UpdateChecker(this, UpdateCheckSource.SPIGOT, "99282")
 				.setDownloadLink("https://www.spigotmc.org/resources/plutochat.99282/")
 				.setNotifyOpsOnJoin(true)
 				.setChangelogLink("https://github.com/Team-Inceptus/PlutoChat/releases/")
@@ -95,7 +102,7 @@ public class PlutoChat extends JavaPlugin {
 				.checkEveryXHours(1)
 				.checkNow();
 
-		new Metrics(this, PLUGIN_ID);
+		new Metrics(this, BSTATS_ID);
 
 		checkConfigs();
 		saveConfig();
@@ -103,7 +110,7 @@ public class PlutoChat extends JavaPlugin {
 		getLogger().info("Done!");
 	}
 
-	private static final int PLUGIN_ID = 99282;
+	private static final int BSTATS_ID = 15392;
 	
 	public static void checkConfigs() {
 		PlutoChat plugin = PlutoChat.getPlugin();
@@ -143,7 +150,7 @@ public class PlutoChat extends JavaPlugin {
 				String uid = p.getUniqueId().toString();
 
 				File f = new File(playerDir, uid + ".yml");
-				if (!(f.exists())) f.createNewFile();
+				if (!f.exists()) f.createNewFile();
 
 				FileConfiguration pInfo = YamlConfiguration.loadConfiguration(f);
 				String name = p.getName();
@@ -172,6 +179,12 @@ public class PlutoChat extends JavaPlugin {
 
 					op.setDisplayName(ChatColor.translateAlternateColorCodes('&', status.getString("displayname")));
 					op.setPlayerListName(ChatColor.translateAlternateColorCodes('&', status.getString("tabname")));
+				}
+
+				try {
+					pInfo.save(f);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		} catch (IOException e) {
