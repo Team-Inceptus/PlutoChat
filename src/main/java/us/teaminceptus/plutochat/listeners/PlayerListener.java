@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +17,7 @@ import us.teaminceptus.plutochat.utils.PlutoUtils;
 
 public class PlayerListener implements Listener {
 	
-	protected PlutoChat plugin;
+	protected final PlutoChat plugin;
 	
 	public PlayerListener(PlutoChat plugin) {
 		this.plugin = plugin;
@@ -30,22 +29,19 @@ public class PlayerListener implements Listener {
 		Player p = e.getPlayer();
 		e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("JoinMessage").replaceAll("%player%", p.getDisplayName()).replaceAll("%name%", p.getName())));
 		FileConfiguration config = plugin.getConfig();
+		FileConfiguration info = PlutoChat.getInfo(p);
 		
-		if (config.getBoolean("TopTabEnabled")) {
-			p.setPlayerListHeader("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("TopTab")) + "\n");
-		} else p.setPlayerListHeader("");
+		if (config.getBoolean("TopTabEnabled")) p.setPlayerListHeader("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("TopTab")) + "\n");
+		else p.setPlayerListHeader("");
 		
-		if (config.getBoolean("BottomTabEnabled")) {
-			p.setPlayerListFooter("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("BottomTab")) + "\n");
-		} else p.setPlayerListFooter("");
-		
-		ConfigurationSection info = PlutoChat.getInfo(p);
+		if (config.getBoolean("BottomTabEnabled")) p.setPlayerListFooter("\n" + ChatColor.translateAlternateColorCodes('&', config.getString("BottomTab")) + "\n");
+		else p.setPlayerListFooter("");
 		
 		p.setDisplayName(ChatColor.translateAlternateColorCodes('&', info.getString("displayname")) + ChatColor.RESET);
 		p.setPlayerListName(ChatColor.translateAlternateColorCodes('&', info.getString("tabname")) + ChatColor.RESET);
 		
 		try {
-			PlutoChat.getPlayersConfig().save(PlutoChat.getPlayersFile());
+			info.save(PlutoChat.getFile(p));
 		} catch (IOException err) {
 			plugin.getLogger().info("Error Saving Configuration");
 			err.printStackTrace();

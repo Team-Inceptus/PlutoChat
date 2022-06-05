@@ -1,24 +1,20 @@
 package us.teaminceptus.plutochat.utils;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
+import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-
-import com.google.gson.Gson;
-
 import us.teaminceptus.plutochat.PlutoChat;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class PlutoUtils {
 
-	private final static HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-	
 	public static boolean isMuted(OfflinePlayer p) {
 		return PlutoChat.getInfo(p).getBoolean("muted");
 	}
@@ -47,18 +43,23 @@ public class PlutoUtils {
 	public static UUID nameToUUID(String name) {
 		if (Bukkit.getOnlineMode()) {
 			try {
-				HttpRequest request = HttpRequest.newBuilder()
-						.GET()
-						.uri(URI.create("https://api.mojang.com/users/profiles/minecraft/" + name))
-						.setHeader("User-Agent", "Java 11 HttpClient Bot")
-						.build();
-				HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-				
-					if (response.statusCode() == 200) {
-						Gson g = new Gson();
-	
-						return untrimUUID(g.fromJson(response.body(), APIPlayer.class).id);
-					}
+				URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
+				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+				connection.setRequestMethod("GET");
+				connection.setRequestProperty("User-Agent", "Java 8 PlutoChat Bot");
+
+				int responseCode = connection.getResponseCode();
+
+				if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
+					BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					StringBuilder builder = new StringBuilder();
+					String inputLine;
+					while((inputLine = input.readLine()) != null) builder.append(inputLine);
+
+					Gson g = new Gson();
+					return untrimUUID(g.fromJson(builder.toString(), APIPlayer.class).id);
+				}
 				
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -67,23 +68,6 @@ public class PlutoUtils {
 				return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));
 			}
     	return null;
-	}
-
-	public static int statusCode(String url) {
-		try {
-			HttpRequest request = HttpRequest.newBuilder()
-					.GET()
-					.uri(URI.create(url))
-					.setHeader("User-Agent", "Java 11 HttpClient Bot")
-					.build();
-			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			
-			return response.statusCode();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return 404;
 	}
 
 	public static UUID untrimUUID(String oldUUID) {

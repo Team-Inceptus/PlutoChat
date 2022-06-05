@@ -1,0 +1,39 @@
+# PlutoChat v${plugin.version} - Build ${project.version}
+#
+# Created by ${plugin.author}
+
+# The Language that PlutoChat's Messages is in.
+# Supported Languages:
+#
+# - en (English)
+# - es (Spanish / Español)
+# - fr (French / Français)
+# - de (German / Deutsch)
+# - pt (Portuguese / Português)
+Language: en
+
+# Whether the top part of the tab list is enabled
+TopTabEnabled: true
+# The Chat showing on the top part of the tab list
+TopTab:   Welcome to my server!
+
+# Whether the bottom part of the tab list is enabled
+BottomTabEnabled: true
+# The Chat showing on the bottom part of the tab list
+BottomTab: Tab by PlutoChat
+
+# Whether Players can use Color Codes in Chat
+ColorChat: true
+
+# The Prefix that comes before a Player's Name in Chat
+ChatPrefix: <
+# The Suffix that comes after a Player's Name in Chat
+ChatSuffix: >
+
+# The Join Message; Supports & Codes.
+# %player% = Player's Name
+JoinMessage: &e%player% has joined the game.
+
+# The Leave Message; Supports & Codes.
+# %player% = Player's Name
+LeaveMessage: &e%player% has left the game.

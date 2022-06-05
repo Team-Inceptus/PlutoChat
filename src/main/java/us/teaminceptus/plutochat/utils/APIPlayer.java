@@ -2,8 +2,8 @@ package us.teaminceptus.plutochat.utils;
 
 public class APIPlayer {
 	
-	public String name;
-	public String id;
+	public final String name;
+	public final String id;
 	
 	public APIPlayer(String name, String id) {
 		this.name = name;
